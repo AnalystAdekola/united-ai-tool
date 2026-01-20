@@ -1,47 +1,38 @@
 import streamlit as st
+from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_tavily import TavilySearchResults
-from langgraph.prebuilt import create_react_agent
+from langchain.agents import initialize_agent, AgentType
 
-# --- UI & THEME ---
+# --- MAN UTD THEME ---
 st.set_page_config(page_title="United AI", page_icon="🔴")
-st.markdown("""
-    <style>
-    .stApp { background-color: #000000; color: white; }
-    h1 { color: #FBE122 !important; }
-    .stButton>button { background-color: #DA291C; color: white; border: 1px solid #FBE122; }
-    </style>
-    """, unsafe_allow_html=True)
+st.markdown("<style>.stApp {background-color: #000000; color: white;} h1 {color: #DA291C !important;}</style>", unsafe_allow_html=True)
 
 st.title("🔴 Manchester United AI Analyst")
 
-# --- SECRETS & AI SETUP ---
+# --- CORE LOGIC ---
 try:
-    # 2026 standard for high-speed agents
+    # 1. Setup LLM
     llm = ChatGoogleGenerativeAI(
         model="gemini-1.5-flash", 
         google_api_key=st.secrets["GOOGLE_API_KEY"]
     )
-    
-    # Dedicated Tavily tool for 2026
-    search_tool = TavilySearchResults(
-        api_key=st.secrets["TAVILY_API_KEY"],
-        max_results=3
+
+    # 2. Setup Search
+    search = TavilySearchResults(api_key=st.secrets["TAVILY_API_KEY"])
+
+    # 3. Setup Agent (The stable 'Legacy' pattern)
+    agent = initialize_agent(
+        tools=[search],
+        llm=llm,
+        agent=AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION,
+        verbose=True
     )
 
-    # In 2026, LangGraph is the "Standard" for all agents
-    agent_executor = create_react_agent(llm, tools=[search_tool])
-
-    # --- CHAT INTERFACE ---
-    query = st.text_input("Ask about United (Transfers, Scores, News):")
-
+    query = st.text_input("Ask about United:")
     if query:
-        with st.spinner("Searching Old Trafford records..."):
-            # New 2026 'invoke' pattern
-            result = agent_executor.invoke({"messages": [("human", query)]})
-            # The answer is in the last message of the result
-            st.info(result["messages"][-1].content)
+        with st.spinner("Searching..."):
+            response = agent.run(f"As a Man Utd expert, answer: {query}")
+            st.success(response)
 
 except Exception as e:
-    st.error(f"Waiting for Configuration: {e}")
-    st.info("Check your 'Advanced Settings > Secrets' in Streamlit.")
+    st.error(f"Configuration Needed: {e}")
