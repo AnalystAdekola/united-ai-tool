@@ -1,12 +1,13 @@
 import streamlit as st
-from langgraph.prebuilt import create_react_agent  # <--- THIS IS THE FIX
-from langchain_community.tools.tavily_search import TavilySearchResults
+from langchain_tavily import TavilySearchResults  # <-- The new 2026 way
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain import hub
+from langchain.agents import AgentExecutor, create_react_agent
 
-# Note: In 2026, LangGraph agents don't always need AgentExecutor, 
-# but for your current code, this import is the most stable:
-from langchain.agents import AgentExecutor
+# ... (rest of your theme code)
+
+# When you initialize the tool later in the code, use this:
+search_tool = TavilySearchResults(max_results=3)
 
 # --- UI CONFIGURATION ---
 st.set_page_config(page_title="United Intelligence", page_icon="🔴")
