@@ -1,7 +1,7 @@
 streamlit
-langchain>=1.0.0
-langchain-community
+langchain
 langchain-google-genai
+langgraph
 langchainhub
 tavily-python
 pillow
