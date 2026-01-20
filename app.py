@@ -12,9 +12,9 @@ st.title("🔴 Manchester United AI Analyst")
 try:
     # 1. Setup the "Brain"
     llm = ChatGoogleGenerativeAI(
-        model="gemini-1.5-flash", 
-        google_api_key=st.secrets["GOOGLE_API_KEY"]
-    )
+    model="gemini-1.5-flash-latest", # <--- Adding '-latest' usually fixes the 404
+    google_api_key=st.secrets["GOOGLE_API_KEY"]
+)
 
     # 2. Setup the "Eyes"
     search = TavilySearchResults(api_key=st.secrets["TAVILY_API_KEY"])
