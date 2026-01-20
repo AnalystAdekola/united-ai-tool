@@ -1,7 +1,7 @@
 import streamlit as st
-from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain.agents import initialize_agent, AgentType
+from langchain_community.tools.tavily_search import TavilySearchResults
+from langgraph.prebuilt import create_react_agent # The new 2026 standard
 
 # --- MAN UTD THEME ---
 st.set_page_config(page_title="United AI", page_icon="🔴")
@@ -9,30 +9,26 @@ st.markdown("<style>.stApp {background-color: #000000; color: white;} h1 {color:
 
 st.title("🔴 Manchester United AI Analyst")
 
-# --- CORE LOGIC ---
 try:
-    # 1. Setup LLM
+    # 1. Setup the "Brain"
     llm = ChatGoogleGenerativeAI(
         model="gemini-1.5-flash", 
         google_api_key=st.secrets["GOOGLE_API_KEY"]
     )
 
-    # 2. Setup Search
+    # 2. Setup the "Eyes"
     search = TavilySearchResults(api_key=st.secrets["TAVILY_API_KEY"])
 
-    # 3. Setup Agent (The stable 'Legacy' pattern)
-    agent = initialize_agent(
-        tools=[search],
-        llm=llm,
-        agent=AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION,
-        verbose=True
-    )
+    # 3. Create the Agent (New 2026 Pattern)
+    # This replaces 'initialize_agent' and 'AgentType'
+    agent_executor = create_react_agent(llm, tools=[search])
 
-    query = st.text_input("Ask about United:")
+    query = st.text_input("What's the latest at Old Trafford?")
     if query:
-        with st.spinner("Searching..."):
-            response = agent.run(f"As a Man Utd expert, answer: {query}")
-            st.success(response)
+        with st.spinner("Analyzing..."):
+            # New 2026 response pattern
+            result = agent_executor.invoke({"messages": [("human", query)]})
+            st.info(result["messages"][-1].content)
 
 except Exception as e:
-    st.error(f"Configuration Needed: {e}")
+    st.error(f"Waiting for Configuration: {e}")
