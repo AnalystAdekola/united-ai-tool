@@ -1,18 +1,10 @@
 import streamlit as st
-from langchain_tavily import TavilySearchResults  # <-- The new 2026 way
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain import hub
-from langchain.agents import AgentExecutor, create_react_agent
+from langchain_tavily import TavilySearchResults
+from langgraph.prebuilt import create_react_agent
 
-# ... (rest of your theme code)
-
-# When you initialize the tool later in the code, use this:
-search_tool = TavilySearchResults(max_results=3)
-
-# --- UI CONFIGURATION ---
-st.set_page_config(page_title="United Intelligence", page_icon="🔴")
-
-# --- CUSTOM CSS FOR THE THEME ---
+# --- UI & THEME ---
+st.set_page_config(page_title="United AI", page_icon="🔴")
 st.markdown("""
     <style>
     .stApp { background-color: #000000; color: white; }
@@ -21,40 +13,35 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- LOGIN GATE ---
-if "authenticated" not in st.session_state:
-    st.session_state["authenticated"] = False
-
-if not st.session_state["authenticated"]:
-    st.image("https://images.unsplash.com/photo-1594911772125-07fc7a2d8d9f") # Old Trafford Image
-    st.title("🔴 Theatre of Dreams AI")
-    password = st.text_input("Enter Access Code", type="password")
-    if st.button("Enter"):
-        if password == "GGMU2026": # Change this to your preferred password
-            st.session_state["authenticated"] = True
-            st.rerun()
-        else:
-            st.error("Wrong code. Keep the faith.")
-    st.stop()
-
-# --- MAIN APP INTERFACE ---
 st.title("🔴 Manchester United AI Analyst")
-st.write("Real-time web-connected intelligence for the Red Devils.")
 
-# Setup Search and AI (using Streamlit secrets for security)
-search = TavilySearchResults(api_key=st.secrets["TAVILY_API_KEY"])
-llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro", google_api_key=st.secrets["GOOGLE_API_KEY"])
+# --- SECRETS & AI SETUP ---
+try:
+    # 2026 standard for high-speed agents
+    llm = ChatGoogleGenerativeAI(
+        model="gemini-1.5-flash", 
+        google_api_key=st.secrets["GOOGLE_API_KEY"]
+    )
+    
+    # Dedicated Tavily tool for 2026
+    search_tool = TavilySearchResults(
+        api_key=st.secrets["TAVILY_API_KEY"],
+        max_results=3
+    )
 
-agent = initialize_agent(
-    tools=[search],
-    llm=llm,
-    agent=AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION,
-    verbose=True
-)
+    # In 2026, LangGraph is the "Standard" for all agents
+    agent_executor = create_react_agent(llm, tools=[search_tool])
 
-query = st.text_input("What would you like to know about United today?")
+    # --- CHAT INTERFACE ---
+    query = st.text_input("Ask about United (Transfers, Scores, News):")
 
-if query:
-    with st.spinner("Searching Old Trafford archives..."):
-        response = agent.run(f"As a Manchester United expert, answer this: {query}")
-        st.info(response)
+    if query:
+        with st.spinner("Searching Old Trafford records..."):
+            # New 2026 'invoke' pattern
+            result = agent_executor.invoke({"messages": [("human", query)]})
+            # The answer is in the last message of the result
+            st.info(result["messages"][-1].content)
+
+except Exception as e:
+    st.error(f"Waiting for Configuration: {e}")
+    st.info("Check your 'Advanced Settings > Secrets' in Streamlit.")
