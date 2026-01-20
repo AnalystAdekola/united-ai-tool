@@ -12,7 +12,7 @@ st.title("🔴 Manchester United AI Analyst")
 try:
     # 1. Setup the "Brain"
     llm = ChatGoogleGenerativeAI(
-    model="gemini-1.5-flash-latest", # <--- Adding '-latest' usually fixes the 404
+    model="gemini-2.0-flash", # <--- The new 2026 powerhouse
     google_api_key=st.secrets["GOOGLE_API_KEY"]
 )
 
