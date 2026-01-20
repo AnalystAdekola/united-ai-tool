@@ -15,9 +15,9 @@ st.title("🔴 Theatre of Dreams AI")
 try:
     # 2. SETUP THE BRAIN (Using the most stable 2026 model)
     llm = ChatGoogleGenerativeAI(
-        model="gemini-1.5-flash", # Switch to 1.5 if 2.0 is still exhausted (it has higher limits)
-        google_api_key=st.secrets["GOOGLE_API_KEY"]
-    )
+    model="gemini-2.0-flash", # <--- The new 2026 powerhouse
+    google_api_key=st.secrets["GOOGLE_API_KEY"]
+)
 
     # 3. SETUP SEARCH
     search = TavilySearchResults(api_key=st.secrets["TAVILY_API_KEY"])
