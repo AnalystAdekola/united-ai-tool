@@ -1,10 +1,12 @@
 import streamlit as st
-from langchain.agents import create_react_agent
-# In 2026, AgentExecutor is often imported from langchain.agents.agent_executor
-from langchain.agents.agent_executor import AgentExecutor 
-from langchain import hub
+from langgraph.prebuilt import create_react_agent  # <--- THIS IS THE FIX
 from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain import hub
+
+# Note: In 2026, LangGraph agents don't always need AgentExecutor, 
+# but for your current code, this import is the most stable:
+from langchain.agents import AgentExecutor
 
 # --- UI CONFIGURATION ---
 st.set_page_config(page_title="United Intelligence", page_icon="🔴")
